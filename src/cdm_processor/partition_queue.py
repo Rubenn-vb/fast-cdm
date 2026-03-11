@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Partition:
-    table_name: str
     source_file: str
     start_offset: int
     end_offset: int
