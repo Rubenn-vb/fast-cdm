@@ -41,7 +41,7 @@ class FileStreamer:
                 )
 
 
-    def stream(
+    def stream_range(
         self, 
         offset: int,
         end_offset: int,
@@ -73,7 +73,7 @@ class FileStreamer:
                     if len(buffer) >= self.partition_size:
                         pos = buffer.rfind(b"\n")
 
-                        if pos == -1 and len(buffer) > self.partition_size * 2:
+                        if pos == -1:
                             if len(buffer) > self.partition_size:
                                 raise ValueError(
                                     f"Row exceeds maximum partition size ({self.partition_size} bytes) "
@@ -81,7 +81,6 @@ class FileStreamer:
                                 )
                             continue
                         
-                        logging.info(f"Processing partition of size {len(buffer)} bytes")
                         yield Partition(
                             source_file=self.source.path_name,
                             start_offset=offset + bytes_processed,
@@ -92,7 +91,6 @@ class FileStreamer:
                         del buffer[:pos + 1] # Keep partial rows in-memory
 
                 if len(buffer) > 0:
-                    logging.info(f"Processing final partition of size {len(buffer)} bytes")
                     yield Partition(
                         source_file=self.source.path_name,
                         start_offset=offset + bytes_processed,
